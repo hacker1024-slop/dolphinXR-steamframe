@@ -680,6 +680,12 @@ if(ENABLE_VR)
   set(BUILD_SDK_TESTS OFF CACHE BOOL "" FORCE)
   set(DYNAMIC_LOADER OFF CACHE BOOL "" FORCE)
   add_subdirectory(Externals/OpenXR "${CMAKE_BINARY_DIR}/Externals/OpenXR" EXCLUDE_FROM_ALL)
+  # Khronos SDK 1.1.65 contains exception handlers even in its no-exception mode.
+  # Keep exceptions local to the loader; Dolphin itself remains exception-free.
+  if(NOT MSVC)
+    target_compile_options(openxr_loader PRIVATE -fexceptions)
+    target_compile_definitions(openxr_loader PRIVATE JSON_USE_EXCEPTIONS=1)
+  endif()
 endif()
 
 if(NOT (WIN32 AND _M_ARM_64))
