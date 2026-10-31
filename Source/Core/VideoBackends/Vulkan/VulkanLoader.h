@@ -23,6 +23,9 @@
 
 #include "vulkan/vulkan.h"
 
+// Xlib defines None as a macro; VR headers use it as an enum member.
+#undef None
+
 #ifdef ANDROID
 #include <unistd.h>
 #endif

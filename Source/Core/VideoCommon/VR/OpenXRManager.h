@@ -29,6 +29,9 @@
 #include "VideoCommon/AbstractFramebuffer.h"
 #include "VideoCommon/VR/VRPanelMath.h"
 
+// Xlib can be included by desktop graphics bindings before this header.
+#undef None
+
 // OpenXRManager owns the XrInstance, XrSystemId, XrSession, and reference XrSpace.
 // It handles the OpenXR session state machine and per-frame timing.
 //
