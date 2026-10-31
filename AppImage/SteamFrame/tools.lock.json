@@ -1,0 +1,22 @@
+{
+  "tools": [
+    {
+      "file": "linuxdeploy-aarch64.AppImage",
+      "url": "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-aarch64.AppImage",
+      "sha256": "5c1fddf96066891e829831cac0d84424690f3b22846c7f8f1bb9990a5c6c73f4",
+      "release_target": "07333c6e942c7d71782b66be924c5d867f9dfdfc"
+    },
+    {
+      "file": "linuxdeploy-plugin-qt-aarch64.AppImage",
+      "url": "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-aarch64.AppImage",
+      "sha256": "d5b5a9020065cefda8c7af7c9500f686b23640eac50c88201a81752c6ee2e49c",
+      "release_target": "9b9fca179e7312ae4a433ad6c3183d73c116180b"
+    },
+    {
+      "file": "runtime-aarch64",
+      "url": "https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-aarch64",
+      "sha256": "9a72a744d221576c9347ec074243acc5c3c7568896b12714e0e82e9f0bf47900",
+      "release_target": "fedfad51acc2860b2916a1eef32ba4a500ff31ef"
+    }
+  ]
+}

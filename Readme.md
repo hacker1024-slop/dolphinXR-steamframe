@@ -111,6 +111,11 @@ cmake -S . -B Build -DENABLE_VR=ON -DENABLE_VULKAN=ON
 cmake --build Build --target dolphin-emu -j $(nproc)
 ```
 
+#### Steam Frame AppImage
+
+For a native ARM64 AppImage that runs directly with SteamVR, see the
+[AppImage build and launch instructions](AppImage/SteamFrame/README.md).
+
 #### Building with Docker
 
 A `Dockerfile` is provided for a reproducible Linux build environment. Build the image from the repository root:

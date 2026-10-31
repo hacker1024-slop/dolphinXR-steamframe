@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=DolphinXR
+Comment=GameCube and Wii emulator with OpenXR support
+Exec=dolphin-emu %f
+Icon=dolphinxr
+Terminal=false
+Categories=Game;Emulator;
+StartupWMClass=dolphin-emu
