@@ -1,0 +1,22 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-or-later
+set -eu
+APPDIR=${APPDIR:-$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)}
+export APPDIR
+export LD_LIBRARY_PATH="$APPDIR/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+for hook in "$APPDIR"/apprun-hooks/*.sh; do
+  if [ -f "$hook" ]; then . "$hook"; fi
+done
+export DOLPHIN_EMU_USERPATH="${DOLPHIN_EMU_USERPATH:-${XDG_DATA_HOME:-$HOME/.local/share}/dolphinxr}"
+mkdir -p "$DOLPHIN_EMU_USERPATH/Config"
+if [ ! -e "$DOLPHIN_EMU_USERPATH/Config/Dolphin.ini" ]; then
+  printf '[Core]\nGFXBackend = Vulkan\n' > "$DOLPHIN_EMU_USERPATH/Config/Dolphin.ini"
+fi
+# Steam Frame registers its ARM64 SteamVR runtime here. Respect explicit overrides.
+if [ -z "${XR_RUNTIME_JSON:-}" ] && [ -r /opt/steamvr/steamxr_linuxarm64.json ]; then
+  export XR_RUNTIME_JSON=/opt/steamvr/steamxr_linuxarm64.json
+fi
+if [ -z "${VR_PATHREG_OVERRIDE:-}" ] && [ -r "$HOME/.config/openvr/openvrpaths.vrpath" ]; then
+  export VR_PATHREG_OVERRIDE="$HOME/.config/openvr/openvrpaths.vrpath"
+fi
+exec "$APPDIR/usr/bin/dolphin-emu" "$@"
