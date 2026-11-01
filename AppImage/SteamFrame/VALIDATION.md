@@ -45,3 +45,14 @@ remain untested.
 
 Through SSH, GUI/version checks used `DISPLAY=:0`. The GUI smoke test used an
 isolated `DOLPHIN_EMU_USERPATH` directory.
+
+## GitHub Actions workflow
+
+The workflow targets Ubuntu 24.04 ARM64 with GCC 14 and Qt 6.8.3. Local checks
+passed Actions linting, shell/Python syntax and Git whitespace checks. The apt
+dependency list resolved in an Ubuntu 24.04 container, and Debian dependency
+copyright collection passed against a real system library. The selected ARM64
+Qt SDK archives were downloaded and their library dependencies inspected.
+
+A hosted Actions run is pending a push to a GitHub fork. The hardware results
+above apply to the earlier native Frame build, not an artifact produced by CI.

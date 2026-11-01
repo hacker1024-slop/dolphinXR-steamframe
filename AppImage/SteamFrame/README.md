@@ -39,6 +39,30 @@ For a persistent extraction instead:
 ./squashfs-root/AppRun
 ```
 
+## GitHub Actions builds
+
+The **Steam Frame AppImage** workflow builds on native `ubuntu-24.04-arm`
+using GCC 14 and the official Qt 6.8.3 ARM64 SDK, including its ICU libraries.
+Ubuntu 24.04 provides the Frame's glibc 2.39 baseline.
+
+Push this branch to your GitHub fork. Relevant source and packaging changes
+trigger builds on pushes and pull requests. To use **Actions → Steam Frame
+AppImage → Run workflow**, first put the workflow on the fork's default branch.
+
+A successful run uploads `DolphinXR-SteamFrame-aarch64-<commit SHA>` containing
+the AppImage and its `.sha256` file, retained for 14 days. Download and extract
+the artifact ZIP, then verify and enable execution:
+
+```sh
+sha256sum -c DolphinXR-SteamFrame-aarch64.AppImage.sha256
+chmod +x DolphinXR-SteamFrame-aarch64.AppImage
+```
+
+The job verifies the checksum and runs `--version` using extraction and Xvfb.
+Headset, graphics and gameplay checks still require a Frame. Actions use pinned
+commit revisions and a read-only repository token; no secrets are needed.
+The workflow uploads build artifacts without publishing a GitHub Release.
+
 ## Build
 
 Build on native ARM64 Linux with glibc compatible with the target Frame. Building
@@ -50,7 +74,7 @@ promise of compatibility with all ARM64 Linux distributions.
 Install the normal Dolphin Linux development dependencies, including Qt base
 and SVG development files, then initialize the repository's Linux submodules.
 The build/packaging scripts additionally need Bash, CMake, Ninja, Python 3.11+,
-qmake6, patchelf, strip and squashfs-tools with Zstandard support.
+qmake6 (or qmake), patchelf, strip and squashfs-tools with Zstandard support.
 
 From the repository root:
 
@@ -61,6 +85,12 @@ git -c submodule.Externals/Qt.update=none \
     submodule update --init --recursive --depth 1 --jobs 8
 ./AppImage/SteamFrame/build.sh
 ```
+
+On Ubuntu 24.04, `./AppImage/SteamFrame/install-ci-deps.sh` installs the CI
+build dependencies using apt and sudo. Install Qt 6.8 separately as shown in
+the workflow; Ubuntu's packaged Qt 6.4 is too old for this source. Set
+`QMAKE=/path/to/Qt/bin/qmake` to select a Qt SDK. The scripts use its prefix
+for CMake and its deployment tools for packaging.
 
 The default build/output directory is `~/.cache/dolphinxr-appimage/`.
 Override it with `BUILD_ROOT` (outside the checkout) and set `JOBS` to adjust
@@ -83,9 +113,10 @@ output directory. The upstream `continuous` download URLs are mutable; if an
 asset is replaced, fetching fails its hash check rather than silently accepting
 new tooling. Review and update the lock file deliberately when upgrading.
 
-On Arch/SteamOS, dependency package license notices are copied into the image.
-For other build distributions, include the corresponding dependency license
-notices before redistributing the resulting image. Dolphin source is licensed
+On Arch/SteamOS and Debian/Ubuntu, dependency package license notices are
+copied into the image. Qt SDK and ICU notices are included, along with the
+SDK SBOM when available. For other build distributions, include the corresponding
+dependency license notices before redistributing the resulting image. Dolphin source is licensed
 GPL-2.0-or-later; dependency licenses remain applicable.
 
 The build disables cubeb's Android audio autodetection because the Frame's

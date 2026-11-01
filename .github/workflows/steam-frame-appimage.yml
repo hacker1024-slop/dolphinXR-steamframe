@@ -1,0 +1,108 @@
+name: Steam Frame AppImage
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/steam-frame-appimage.yml'
+      - 'AppImage/**'
+      - 'CMake/**'
+      - 'CMakeLists.txt'
+      - 'Source/**'
+      - 'Externals/**'
+      - '.gitmodules'
+      - 'Data/**'
+      - 'Languages/**'
+      - 'COPYING'
+      - 'LICENSES/**'
+  pull_request:
+    paths:
+      - '.github/workflows/steam-frame-appimage.yml'
+      - 'AppImage/**'
+      - 'CMake/**'
+      - 'CMakeLists.txt'
+      - 'Source/**'
+      - 'Externals/**'
+      - '.gitmodules'
+      - 'Data/**'
+      - 'Languages/**'
+      - 'COPYING'
+      - 'LICENSES/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-frame-appimage-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Native ARM64 AppImage
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    env:
+      JOBS: '2'
+      CC: gcc-14
+      CXX: g++-14
+    steps:
+      - name: Set build directory
+        run: printf 'BUILD_ROOT=%s/dolphinxr-appimage\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Initialize Linux submodules
+        run: |
+          git -c submodule.Externals/Qt.update=none \
+              -c submodule.Externals/FFmpeg-bin.update=none \
+              -c submodule.Externals/wil.update=none \
+              submodule update --init --recursive --depth 1 --jobs 2
+
+      - name: Install build dependencies
+        run: ./AppImage/SteamFrame/install-ci-deps.sh
+
+      # Noble's system Qt is 6.4; this source needs newer Qt APIs. The official
+      # ARM64 Qt 6.8 binaries use Ubuntu 24.04 / glibc 2.39, matching the Frame.
+      - name: Install Qt 6.8.3 ARM64 SDK
+        uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
+        with:
+          version: '6.8.3'
+          host: linux_arm64
+          target: desktop
+          arch: linux_gcc_arm64
+          archives: 'icu qtbase qtsvg qttranslations'
+          install-deps: 'false'
+          setup-python: 'false'
+          aqtversion: '==3.3.0'
+          cache: 'true'
+          cache-key-prefix: steam-frame-qt
+
+      - name: Build AppImage
+        run: |
+          export QMAKE="$QT_ROOT_DIR/bin/qmake"
+          ./AppImage/SteamFrame/build.sh
+
+      - name: Check extracted AppImage startup
+        env:
+          QT_QPA_PLATFORM: xcb
+          DOLPHIN_EMU_USERPATH: ${{ runner.temp }}/dolphinxr-smoke-profile
+        run: |
+          cd "$BUILD_ROOT"
+          sha256sum -c DolphinXR-SteamFrame-aarch64.AppImage.sha256
+          xvfb-run --auto-servernum timeout 60 ./DolphinXR-SteamFrame-aarch64.AppImage \
+            --appimage-extract-and-run --version
+
+      - name: Upload AppImage and checksum
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: DolphinXR-SteamFrame-aarch64-${{ github.sha }}
+          path: |
+            ${{ env.BUILD_ROOT }}/DolphinXR-SteamFrame-aarch64.AppImage
+            ${{ env.BUILD_ROOT }}/DolphinXR-SteamFrame-aarch64.AppImage.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
