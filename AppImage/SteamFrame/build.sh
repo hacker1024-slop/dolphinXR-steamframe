@@ -11,9 +11,13 @@ if [[ $(uname -m) != aarch64 ]]; then
   echo 'Build on native ARM64 Linux with a Steam Frame-compatible glibc baseline.' >&2
   exit 1
 fi
-for tool in cmake ninja python3 mksquashfs patchelf strip qmake6; do command -v "$tool" >/dev/null; done
+for tool in cmake ninja python3 mksquashfs patchelf strip; do command -v "$tool" >/dev/null; done
+export QMAKE="${QMAKE:-$(command -v qmake6 || command -v qmake)}"
+command -v "$QMAKE" >/dev/null
+qt_prefix=$("$QMAKE" -query QT_INSTALL_PREFIX)
 cmake -S "$repo_root" -B "$build_root/build" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib \
+  -DCMAKE_PREFIX_PATH="$qt_prefix" \
   -DENABLE_VR=ON -DENABLE_VULKAN=ON -DENABLE_ALSA=OFF \
   -DENABLE_SDL=ON -DENABLE_EVDEV=ON -DENABLE_TESTS=OFF -DENABLE_AUTOUPDATE=OFF \
   -DUSE_DISCORD_PRESENCE=OFF -DUSE_SYSTEM_SDL3=OFF -DUSE_SYSTEM_FMT=OFF \

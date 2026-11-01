@@ -26,7 +26,7 @@ install -Dm644 "$script_dir/dolphinxr.desktop" "$appdir/usr/share/applications/d
 install -Dm644 "$appdir/usr/share/icons/hicolor/scalable/apps/dolphin-emu.svg" \
   "$appdir/usr/share/icons/hicolor/scalable/apps/dolphinxr.svg"
 export PATH="$tools:$PATH"
-export QMAKE="${QMAKE:-$(command -v qmake6)}"
+export QMAKE="${QMAKE:-$(command -v qmake6 || command -v qmake)}"
 export EXTRA_QT_MODULES=svg
 export APPIMAGE_EXTRACT_AND_RUN=1
 # Host graphics loaders and drivers must match SteamOS and SteamVR.
@@ -44,7 +44,12 @@ install -m755 "$script_dir/AppRun" "$appdir/AppRun"
 install -Dm644 "$repo_root/COPYING" "$appdir/usr/share/licenses/dolphinxr/COPYING"
 cp -a "$repo_root/LICENSES" "$appdir/usr/share/licenses/dolphinxr/"
 python3 "$script_dir/copy-licenses.py" "$appdir"
+cp -a "$script_dir/licenses/Qt" "$script_dir/licenses/ICU" "$appdir/usr/share/licenses/"
 install -Dm644 "$script_dir/tools.lock.json" "$appdir/usr/share/doc/dolphinxr/AppImage-tools.lock.json"
+qt_prefix=$("$QMAKE" -query QT_INSTALL_PREFIX)
+if [[ -d "$qt_prefix/sbom" ]]; then
+  cp -a "$qt_prefix/sbom" "$appdir/usr/share/doc/dolphinxr/qt-sbom"
+fi
 # Build a standard Type 2 image by appending SquashFS to the pinned runtime.
 filesystem="$output_dir/DolphinXR.squashfs"
 mksquashfs "$appdir" "$filesystem" -noappend -all-root -no-xattrs \
