@@ -11,6 +11,7 @@ if [[ $(id -u) == 0 ]]; then as_root=(); else as_root=(sudo); fi
   libx11-dev libxext-dev libxrandr-dev libxi-dev libxrender-dev \
   libxkbcommon-dev libxkbcommon-x11-0 libxcb-cursor0 \
   libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0 \
+  libxcb-randr0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-xfixes0 libxcb-xkb1 \
   libfontconfig1-dev libfreetype6-dev libglib2.0-dev libsm6 libice6 libx11-xcb1 \
   libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev \
   libudev-dev libevdev-dev libasound2-dev libpulse-dev libspeexdsp-dev \

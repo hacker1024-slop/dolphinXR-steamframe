@@ -81,6 +81,14 @@ jobs:
           cache: 'true'
           cache-key-prefix: steam-frame-qt
 
+      - name: Check Qt X11 dependencies
+        run: |
+          dependencies=$(ldd "$QT_ROOT_DIR/plugins/platforms/libqxcb.so")
+          printf '%s\n' "$dependencies"
+          case "$dependencies" in
+            *"not found"*) echo 'Missing Qt X11 runtime dependencies' >&2; exit 1 ;;
+          esac
+
       - name: Build AppImage
         run: |
           export QMAKE="$QT_ROOT_DIR/bin/qmake"
