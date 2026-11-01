@@ -109,9 +109,11 @@ AppImage runtime. Graphics drivers and loaders are excluded from bundling.
 
 `tools.lock.json` pins SHA-256 hashes for linuxdeploy, its Qt plugin and the
 AppImage runtime. Downloads are verified before execution and cached under the
-output directory. The upstream `continuous` download URLs are mutable; if an
-asset is replaced, fetching fails its hash check rather than silently accepting
-new tooling. Review and update the lock file deliberately when upgrading.
+output directory. Downloads use GitHub release asset IDs instead of mutable
+`continuous` URLs.
+If upstream deletes a pinned asset, the download fails instead of selecting a
+replacement. Tool hashes are also verified before compilation. Review and
+update the lock file deliberately when upgrading.
 
 On Arch/SteamOS and Debian/Ubuntu, dependency package license notices are
 copied into the image. Qt SDK and ICU notices are included, along with the

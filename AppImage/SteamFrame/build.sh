@@ -15,6 +15,8 @@ for tool in cmake ninja python3 mksquashfs patchelf strip; do command -v "$tool"
 export QMAKE="${QMAKE:-$(command -v qmake6 || command -v qmake)}"
 command -v "$QMAKE" >/dev/null
 qt_prefix=$("$QMAKE" -query QT_INSTALL_PREFIX)
+# Verify external tools before spending time compiling Dolphin.
+python3 ./fetch-tools.py "$build_root/tools"
 cmake -S "$repo_root" -B "$build_root/build" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib \
   -DCMAKE_PREFIX_PATH="$qt_prefix" \
